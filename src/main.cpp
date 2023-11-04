@@ -110,10 +110,12 @@ unsigned long uptime = 0; // save value we can use in sketch even if we're inter
 // Used to indicate if we need to send all date or just modified ones
 boolean fulldata = true;
 
-HardwareSerial Serial1(2);  // UART1/Serial2 pins 16,17
+// HardwareSerial Serial1(2);  // UART1/Serial2 pins 16,17
 //HardwareSerial Serial1(1);  // UART1/Serial1 pins 9,10
 //HardwareSerial Serial1(1);  // UART1/Serial1 pins 9,10
- 
+
+void sendJSON(ValueList *me, boolean all);
+
 /* ======================================================================
 Function: ADPSCallback 
 Purpose : called by library when we detected a ADPS on any phased
