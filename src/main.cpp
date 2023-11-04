@@ -26,7 +26,8 @@
 
 //#define BOARD_EZSBC
 //#define BOARD_LOLIN32
-#define BOARD_DENKY32
+// #define BOARD_DENKY32
+#define BOARD_ESP_DEVKIT
 
 // https://www.tindie.com/products/ddebeer/esp32-dev-board-wifibluetooth-with-ftdi-/
 #if defined (BOARD_EZSBC)
@@ -67,6 +68,16 @@
 
 #define RGB_LED_PIN     25
 
+// Denky32
+#elif defined (BOARD_ESP_DEVKIT)
+
+#define LED_PIN         0
+
+// #define TIC_ENABLE_PIN  4
+#define TIC_RX_PIN      16
+//#define TIC_TX_PIN      17
+
+// #define RGB_LED_PIN     25
 
 #endif
 
@@ -90,16 +101,16 @@ TInfo tinfo; // Teleinfo object
 
 // Pour clignotement LED asynchrone
 unsigned long blinkLed  = 0;
-uint8_t blinkDelay= 0;
+uint8_t blinkDelay = 0;
 
 // Uptime timer
-boolean tick1sec=0;// one for interrupt, don't mess with 
-unsigned long uptime=0; // save value we can use in sketch even if we're interrupted
+boolean tick1sec = 0;// one for interrupt, don't mess with 
+unsigned long uptime = 0; // save value we can use in sketch even if we're interrupted
 
 // Used to indicate if we need to send all date or just modified ones
 boolean fulldata = true;
 
-//HardwareSerial Serial1(2);  // UART1/Serial2 pins 16,17
+HardwareSerial Serial1(2);  // UART1/Serial2 pins 16,17
 //HardwareSerial Serial1(1);  // UART1/Serial1 pins 9,10
 //HardwareSerial Serial1(1);  // UART1/Serial1 pins 9,10
  
