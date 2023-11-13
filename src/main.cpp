@@ -147,6 +147,3 @@ void loop()
   //   tick1sec = true;
   // }
 }
-
-
- 
