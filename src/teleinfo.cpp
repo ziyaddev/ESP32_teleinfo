@@ -2,24 +2,36 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Arduino.h>
-#include "teleinfo.h"
+#include "teleinfo.hpp"
 
 char	*ft_teleinfo_extract(char *str, const char *labl, int data_len, char *nrj_meter_data)
 {
 	char	*str_buf;
+	Serial.println("begin of TI extract ft");
+	Serial.print("str : ");
+	Serial.println(str);
 
-	if (!*str)
-		return (0);
 	str_buf = (char *)malloc(sizeof(char) * (strlen(str) + 1));
 	// if (!str_buf)
 	// 	return (0);
+	Serial.println("1st malloc inside TI extract");
 
 	// Search for label in the string
+	Serial.print("1. str_buf : ");
+	Serial.println(str_buf);
 	str_buf = strstr(str, labl);
+	Serial.println("strstr inside TI extract");
+	Serial.print("2. str_buf : ");
+	Serial.println(str_buf);
 
-	strncpy(nrj_meter_data, (str_buf + strlen(labl) + 1), data_len);
-
+	// It fails here !
+	if (str_buf)
+	{
+		strncpy(nrj_meter_data, (str_buf + strlen(labl) + 1), data_len);
+		Serial.println("strncpy inside TI extract");
+	}
 	free(str_buf);
+	Serial.println("free inside TI extract");
 	return (nrj_meter_data);
 }
 
@@ -31,13 +43,17 @@ char	*ft_deserializer(char *str)
 	int		len;
 
 	buf = (char *)malloc(sizeof(char) * (5 + 1));
-	if (!buf)
-		return (0);
+	// if (!buf)
+	// 	return (0);
 	i = 0;
 	j = 0;
+	Serial.println("begin of deserializer ft");
+	Serial.println("deserializer ft str begin");
+	Serial.println(str);
 
 	if (Serial1.available())
 	{
+		Serial.println("Serial available");
 		// Fill in buf string
 		while (strlen(buf) < 6)
 			buf[i++] = Serial1.read();
@@ -57,6 +73,8 @@ char	*ft_deserializer(char *str)
 			str[j++] = Serial1.read();
 	}
 	free(buf);
+	Serial.println("deserializer ft str end");
+	Serial.println(str);
 	return (str);
 }
 
