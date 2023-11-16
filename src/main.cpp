@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "teleinfo.h"
+#include "teleinfo.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -178,9 +178,10 @@ void loop()
   incoming_data = (char *)malloc(sizeof(char) * (209 + 1));
   if (!incoming_data)
     Serial.println("malloc error");
-  
+
   Serial.println("1st malloc");
 
+  // This function is used to fill in an empty string with serial incoming data
   incoming_data = ft_deserializer(incoming_data);
   Serial.println("ft_deserializer");
 
