@@ -1,4 +1,9 @@
 #include <Arduino.h>
+#include "teleinfo.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 #define TIC_RX_PIN      16
 #define TIC_TX_PIN      17
@@ -17,6 +22,21 @@ unsigned long uptime = 0; // save value we can use in sketch even if we're inter
 
 // Used to indicate if we need to send all date or just modified ones
 boolean fulldata = true;
+
+typedef struct teleinfo
+{
+  int	total_kwh;
+  int inst_amp_1;
+  int inst_amp_2;
+  int inst_amp_3;
+  int	amp_max_1;
+  int amp_max_2;
+  int amp_max_3;
+  int max_pow;
+  int app_pow;
+} teleinfo;
+
+teleinfo Teleinfo;
 
 // HardwareSerial Serial1(2);  // UART1/Serial2 pins 16,17
 //HardwareSerial Serial1(1);  // UART1/Serial1 pins 9,10
@@ -121,29 +141,88 @@ void setup()
 
 }
 
+// void loop()
+// {
+//   static char c;
+//   static unsigned long previousMillis = 0;
+//   unsigned long currentMillis = millis();
+  
+//   // On a reçu un caractère ?
+//   if ( Serial1.available() )
+//   {
+//     if (c == '\n')
+//       digitalWrite(LED_PIN, HIGH);
+
+//     // Le lire
+//     c = Serial1.read();
+
+//     // L'affcher dans la console
+//     Serial.print(c);
+//   }
+//   digitalWrite(LED_PIN, LOW);
+
+//   // if (currentMillis - previousMillis > 1000 ) {
+//   //   // save the last time you blinked the LED 
+//   //   previousMillis = currentMillis;   
+//   //   tick1sec = true;
+//   // }
+// }
+
 void loop()
 {
-  static char c;
-  static unsigned long previousMillis = 0;
-  unsigned long currentMillis = millis();
+  char *incoming_data;
+  char *nrj_meter_data;
+
+  Serial.println("loop begin");
+
+  incoming_data = (char *)malloc(sizeof(char) * (209 + 1));
+  if (!incoming_data)
+    Serial.println("malloc error");
   
-  // On a reçu un caractère ?
-  if ( Serial1.available() )
-  {
-    if (c == '\n')
-      digitalWrite(LED_PIN, HIGH);
+  Serial.println("1st malloc");
 
-    // Le lire
-    c = Serial1.read();
+  incoming_data = ft_deserializer(incoming_data);
+  Serial.println("ft_deserializer");
 
-    // L'affcher dans la console
-    Serial.print(c);
-  }
-  digitalWrite(LED_PIN, LOW);
+  nrj_meter_data = (char *)malloc(sizeof(char) * (9 + 1));
+  Serial.println("malloc error\n");
+  // if (!nrj_meter_data)
+  //   Serial.println("malloc error after\n");
+	Teleinfo.total_kwh = atoi(ft_teleinfo_extract(incoming_data, "\nBASE", 9, nrj_meter_data));
+  Serial.println("teleinfo extract ok");
 
-  // if (currentMillis - previousMillis > 1000 ) {
-  //   // save the last time you blinked the LED 
-  //   previousMillis = currentMillis;   
-  //   tick1sec = true;
-  // }
+  free(nrj_meter_data);
+  Serial.println("2nd malloc");
+
+  nrj_meter_data = (char *)malloc(sizeof(char) * (3 + 1));
+  // if (!nrj_meter_data)
+  //   Serial.println("malloc error\n");
+  Teleinfo.inst_amp_1 = atoi(ft_teleinfo_extract(incoming_data, "\nIINST1", 3, nrj_meter_data));
+  Teleinfo.inst_amp_2 = atoi(ft_teleinfo_extract(incoming_data, "\nIINST2", 3, nrj_meter_data));
+	Teleinfo.inst_amp_3 = atoi(ft_teleinfo_extract(incoming_data, "\nIINST3", 3, nrj_meter_data));
+	Teleinfo.amp_max_1 = atoi(ft_teleinfo_extract(incoming_data, "\nIMAX1", 3, nrj_meter_data));
+	Teleinfo.amp_max_2 = atoi(ft_teleinfo_extract(incoming_data, "\nIMAX2", 3, nrj_meter_data));
+	Teleinfo.amp_max_3 = atoi(ft_teleinfo_extract(incoming_data, "\nIMAX3", 3, nrj_meter_data));
+  free(nrj_meter_data);
+  Serial.println("3rd malloc");
+
+  nrj_meter_data = (char *)malloc(sizeof(char) * (5 + 1));
+  // if (!nrj_meter_data)
+  //   printf("malloc error\n");
+	Teleinfo.app_pow = atoi(ft_teleinfo_extract(incoming_data, "\nPAPP", 5, nrj_meter_data));
+  Teleinfo.max_pow = atoi(ft_teleinfo_extract(incoming_data, "\nPMAX", 5, nrj_meter_data));
+  free(nrj_meter_data);
+
+	printf("\nBASE : %d\n", Teleinfo.total_kwh);
+	printf("Inst Amp 1 : %d\n", Teleinfo.inst_amp_1);
+	printf("Inst Amp 2 : %d\n", Teleinfo.inst_amp_2);
+	printf("Inst Amp 3 : %d\n", Teleinfo.inst_amp_3);
+	printf("Max Amp 1 : %d\n", Teleinfo.amp_max_1);
+	printf("Max Amp 2 : %d\n", Teleinfo.amp_max_2);
+	printf("Max Amp 3 : %d\n", Teleinfo.amp_max_3);
+	printf("Max Power : %d\n", Teleinfo.max_pow);
+	printf("App Power : %d\n", Teleinfo.app_pow);
+	printf("sizeof data : %ld\n", sizeof(incoming_data));
+
+  free(incoming_data);
 }
