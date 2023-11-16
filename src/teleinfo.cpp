@@ -72,6 +72,11 @@ char	*ft_deserializer(char *str)
 		while (!strstr(str, "\nMOTDETAT"))
 			str[j++] = Serial1.read();
 	}
+	else
+	{
+		while (str[i])
+			str[i++] = '-';
+	}
 	free(buf);
 	Serial.println("deserializer ft str end");
 	Serial.println(str);
