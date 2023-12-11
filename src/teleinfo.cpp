@@ -51,26 +51,46 @@ char	*ft_deserializer(char *str)
 	Serial.println("deserializer ft str begin");
 	Serial.println(str);
 
+	bzero(buf, 6);
 	if (Serial1.available())
 	{
 		Serial.println("Serial available");
 		// Fill in buf string
+		Serial.print("strlen(buf) : ");
+		Serial.println(strlen(buf));
 		while (strlen(buf) < 6)
+		{
 			buf[i++] = Serial1.read();
+			Serial.print(buf[i - 1]);
+			Serial.println("\nstrlen buf < 6");
+		}
 		// Calculate buf length
 		len = strlen(buf);
+		Serial.print("len : ");
+		Serial.println(len);
 		// Check if buf string contains : \nADCO
-		while (buf != "\nADCO")
+		while (strncmp(buf, "\nADCO", 4))
 		{
+			Serial.print("buf shift : ");
+			Serial.println(buf);
 			ft_left_shift(buf, len);
 			buf[len - 1] = Serial1.read();
+
 		}
 		// Copy buf content to str
 		while (*buf)
+		{
+			Serial.print("Copying content to str : ");
 			str[j++] = *buf++;
+			Serial.println(str[j]);
+		}
 		// Search for end of wanted string
 		while (!strstr(str, "\nMOTDETAT"))
+		{
+			Serial.println("MOTDETAT not found");
 			str[j++] = Serial1.read();
+			Serial.print(str[j]);
+		}
 	}
 	else
 	{
